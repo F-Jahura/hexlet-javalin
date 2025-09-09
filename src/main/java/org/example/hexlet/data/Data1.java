@@ -1,11 +1,11 @@
-package org.example.hexlet;
+package org.example.hexlet.data;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.datafaker.Faker;
 
-public class DataUsers {
+public class Data1 {
     private static final int USERS_COUNT = 30;
 
     private static int idCounter = USERS_COUNT;

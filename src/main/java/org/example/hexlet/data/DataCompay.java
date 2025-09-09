@@ -1,4 +1,4 @@
-package org.example.hexlet;
+package org.example.hexlet.data;
 
 import java.util.Random;
 import net.datafaker.Faker;

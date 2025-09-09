@@ -1,6 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+
 plugins {
     id("java")
     application
@@ -27,6 +28,9 @@ dependencies {
     implementation("gg.jte:jte:3.1.9")
     implementation ("net.datafaker:datafaker:2.3.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+    implementation("gg.jte:jte:3.1.9")
+    implementation("io.javalin:javalin-rendering:6.1.3")
+    implementation ("org.apache.commons:commons-text:1.9")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

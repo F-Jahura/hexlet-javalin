@@ -1,21 +1,36 @@
 package org.example.hexlet;
-import com.sun.source.tree.IfTree;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
+import io.javalin.rendering.template.JavalinJte;
+import org.example.hexlet.data.*;
+import org.example.hexlet.dto.courses.CoursePage;
+import org.example.hexlet.dto.courses.CoursesPage;
+import org.example.hexlet.dto.users.UserPage;
+import org.example.hexlet.dto.users.UsersPage;
+import org.example.hexlet.model.Course;
+import org.example.hexlet.model.NewUser;
+import org.example.hexlet.model.User;
+import org.apache.commons.text.StringEscapeUtils;
+import org.example.hexlet.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class HelloWorld {
     private static final List<Map<String, String>> COMPANIES = DataCompay.getCompanies();
+
+    private static final List<User> USERS = DataUser.getUsers();
     public static Javalin getApp1() {
         var app1 = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
         });
         app1.get("/", ctx -> ctx.result("Hello World"));          //   http://localhost:7070
-        app1.get("/users", ctx -> ctx.result("GET /users"));      //   http://localhost:7070/users
-        app1.post("/users", ctx -> ctx.result("POST /users"));
+        app1.get("/users_get", ctx -> ctx.result("GET /users"));      //   http://localhost:7070/users
+        app1.post("/users_post", ctx -> ctx.result("POST /users"));
 
         return app1;
     }
@@ -24,7 +39,7 @@ public class HelloWorld {
         List<String> phones = Data.getPhones();
         List<String> domains = Data.getDomains();
 
-        List<Map<String, String>> USERS = DataUsers.getUsers();
+        List<Map<String, String>> USERS = Data1.getUsers();
 
 
         var app = Javalin.create(config -> {
@@ -75,7 +90,7 @@ public class HelloWorld {
             ctx.json(COMPANIES);
         });
 
-        app.get("/", ctx -> {                      //      http://localhost:8080/
+        app.get("/text", ctx -> {                      //      http://localhost:8080/
             ctx.result("open something like (you can change id): /companies/5");
         });
 
@@ -88,13 +103,138 @@ public class HelloWorld {
         });
 
 
+        //////////////////////////////////////////jte
+        app.get("/jte", ctx -> ctx.render("index.jte"));       //     http://localhost:8080/jte
+
+        //////////////////////jte
+        var app_jte = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        return app;
+    }
+
+    public static Javalin getAppCourse() {
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        app.get("/courses/{id}", ctx -> {      // http://localhost:7070/courses/2
+            var id = ctx.pathParam("id");
+            var courseId = Long.parseLong(id);
+            var course = DataCourse.getCourses().stream()
+                    .filter(c -> c.getId() == courseId)
+                    .findFirst()
+                    .orElse(null);
+            var page = new CoursePage(course);
+            ctx.render("courses/show.jte", model("page", page));
+        });
+
+        /*app.get("/courses", ctx -> {             //   http://localhost:7070/courses
+            var courses = DataCourse.getCourses();
+            var header = "Курсы по программированию";
+            var page = new CoursesPage(courses, header);
+            ctx.render("courses/index.jte", model("page", page));
+        });*/
+
+        app.get("/courses", ctx -> {             //   http://localhost:7070/courses
+            var term = ctx.queryParam("term");
+            var header = "Курсы по программированию";
+            List<Course> courses;
+            if (term != null) {
+                courses = DataCourse.getCourses().stream()
+                        .filter(t -> t.getName().equals(term))
+                        .collect(Collectors.toList());
+            } else {
+                courses = DataCourse.getCourses();
+            }
+            var page = new CoursesPage(courses, header, term);
+            ctx.render("courses/index.jte", model("page", page));
+        });
+
+        return app;
+    }
+
+    public static Javalin getAppUser() {
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        // BEGIN (write your solution here)
+        app.get("/users/{id}", ctx -> {               //   http://localhost:7070/users/14
+            var id = ctx.pathParam("id");
+            var escapedId = StringEscapeUtils.escapeHtml4(id);
+            var userId = Long.parseLong(escapedId);
+            var user = USERS.stream()
+                    .filter(c -> c.getId() == userId)
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundResponse("User not found"));;
+            var page = new UserPage(user);
+            ctx.render("users/show.jte", model("page", page));
+        });
+
+        /*app.get("/users", ctx -> {                  // http://localhost:7070/users
+            var header = "Курсы по программированию";
+            var page = new UsersPage(USERS, header);
+            ctx.render("users/index.jte", model("page", page));
+        });*/
+
+
+        app.get("/users", ctx -> {
+            var term = ctx.queryParam("term");
+            List<User> users;
+            if (term != null) {
+                users = DataUser.getUsers().stream()
+                        .filter(t -> t.getFirstName().toLowerCase().contains(term.toLowerCase()))
+                        .collect(Collectors.toList());
+            } else {
+                users = USERS;
+            }
+            var page = new UsersPage(users, term);
+            ctx.render("users/index.jte", model("page", page));
+        });
+
+
+        app.get("/", ctx -> {
+            ctx.render("index.jte");
+        });
+
+
+        app.get("/users-build", ctx -> {
+            ctx.render("users/build.jte");
+        });
+
+        app.post("/users", ctx -> {
+            var id = ctx.pathParam("id");
+            var userId = Long.parseLong(id);
+            var firstName = ctx.formParam("firstName").trim();
+            var lastName = ctx.formParam("lastName").trim();
+            var email = ctx.formParam("email").trim().toLowerCase();
+            var password = ctx.formParam("password");
+            firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
+            lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
+
+            var user = new User(userId, firstName, lastName, email, password);
+            UserRepository.save(user);
+            ctx.redirect("/users");
+        });
+
         return app;
     }
     public static void main(String[] args) {
-        Javalin app1 = getApp1();
-        app1.start("0.0.0.0", 7070);
+        /*Javalin app1 = getApp1();
+        app1.start("0.0.0.0", 7070);*/
 
-        Javalin app = getApp();
-        app.start("0.0.0.0", 8080);
+        /*Javalin app = getApp();
+        app.start("0.0.0.0", 8080);*/
+
+        Javalin app2 = getAppCourse();
+        app2.start("0.0.0.0", 8080);
+
+        Javalin app3 = getAppUser();
+        app3.start("0.0.0.0", 7070);
     }
 }
