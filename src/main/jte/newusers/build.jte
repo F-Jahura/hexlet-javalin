@@ -1,36 +1,46 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration</title>
-</head>
-<body>
-    <form action="/users" method="post">
-      <div>
-        <label>
-          Firstname
-          <input type="text" name="firstName" />
-        </label>
-      </div>
-      <div>
-        <label>
-          Lastname
-          <input type="text" name="lastName" />
-        </label>
-      </div>
-      <div>
-        <label>
-          Email
-          <input type="email" required name="email" />
-        </label>
-      </div>
-      <div>
-        <label>
-          Password
-          <input type="text" required name="password" />
-        </label>
-      </div>
-      <input type="submit" value="Register" />
-    </form>
-</body>
-</html>
+@import org.example.hexlet.dto.newusers.BuildNewUserPage
+  @param BuildNewUserPage page
+
+  @if(page.getErrors() != null)
+      <ul>
+          @for(var validator : page.getErrors().values())
+              @for(var error : validator)
+                  <li>${error.getMessage()}</li>
+              @endfor
+          @endfor
+      </ul>
+  @endif
+
+  <form action="/users" method="post">
+    <div>
+      <label>
+        FirstName
+        <input type="text" name="firstName" value="${page.getFirstName()}" />
+      </label>
+    </div>
+    <div>
+       <label>
+          LastName
+          <input type="text" name="lastName" value="${page.getLastName()}" />
+       </label>
+     </div>
+    <div>
+      <label>
+        Email
+        <input type="email" required name="email" value="${page.getEmail()}" />
+      </label>
+    </div>
+    <div>
+      <label>
+        Password
+        <input type="password" required name="password" />
+      </label>
+    </div>
+    <div>
+      <label>
+        Password Confirm
+        <input type="password" required name="passwordConfirmation" />
+      </label>
+    </div>
+    <input type="submit" value="Register" />
+  </form>

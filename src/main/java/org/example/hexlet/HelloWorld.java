@@ -1,22 +1,30 @@
 package org.example.hexlet;
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.DirectoryCodeResolver;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import io.javalin.validation.ValidationException;
 import org.example.hexlet.data.*;
+import org.example.hexlet.dto.articles.ArticlesPage;
+import org.example.hexlet.dto.articles.BuildArticlePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
 import org.example.hexlet.dto.newusers.BuildNewUserPage;
 import org.example.hexlet.dto.newusers.NewUsersPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.dto.users.UsersPage;
+import org.example.hexlet.model.Article;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.model.NewUser;
 import org.example.hexlet.model.User;
 import org.apache.commons.text.StringEscapeUtils;
+import org.example.hexlet.repository.ArticleRepository;
 import org.example.hexlet.repository.NewUserRepository;
 import org.example.hexlet.repository.UserRepository;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -251,28 +259,71 @@ public class HelloWorld {
         app.post("/users", ctx -> {
             var firstName = ctx.formParam("firstName").trim();
             var lastName = ctx.formParam("lastName").trim();
-            var email = ctx.formParam("email").trim().toLowerCase();
+            var email = ctx.formParam("email");
+            String password;
 
             try {
                 var passwordConfirmation = ctx.formParam("passwordConfirmation");
-                var password = ctx.formParamAsClass("password", String.class)
-                        .check(value -> value.equals(passwordConfirmation), "Пароли не совпадают")
-                        .check(value -> value.length() > 6, "У пароля недостаточная длина")
+                password = ctx.formParamAsClass("password", String.class)
+                        .check(value -> value.equals(passwordConfirmation), "Password does not match")
+                        .check(value -> value.length() > 6, "Password shorter than 6")
                         .get();
                 var user = new NewUser(firstName, lastName, email, password);
                 NewUserRepository.save(user);
                 ctx.redirect("/users");
             } catch (ValidationException e) {
+                ctx.status(422);
                 var page = new BuildNewUserPage(firstName, lastName, email, e.getErrors());
-                ctx.render("users/build.jte", model("page", page));
+                ctx.render("newusers/build.jte", model("page", page));
             }
         });
 
+        return app;
+    }
 
-        app.post("/__test/clear", ctx -> {
-            NewUserRepository.clear();
-            ctx.status(204);
+    public static Javalin getArticleApp() {
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
         });
+
+        app.get("/", ctx -> {
+            ctx.result("Go to /articles");
+        });
+
+        app.get("/articles", ctx -> {
+            List<Article> articles = ArticleRepository.getEntities();
+            var page = new ArticlesPage(articles);
+            ctx.render("articles/index.jte", model("page", page));
+        });
+
+        // BEGIN (write your solution here)
+        app.get("/articles/build", ctx -> {
+            var page = new BuildArticlePage();
+            ctx.render("articles/build.jte", model("page", page));
+        });
+
+        app.post("/articles", ctx -> {
+            String title = null;
+            String content = null;
+            try {
+                title = ctx.formParamAsClass("title", String.class)
+                        .check(value -> value.length() > 2, "title shorter than 2")
+                        .check(value -> !ArticleRepository.existsByTitle(value), "title must be unique")
+                        .get();
+                content = ctx.formParamAsClass("content", String.class)
+                        .check(value -> value.length() > 10, "content shorter than 2")
+                        .get();
+                var article = new Article(title, content);
+                ArticleRepository.save(article);
+                ctx.redirect("/articles");
+            } catch (ValidationException e) {
+                ctx.status(422);
+                var page = new BuildArticlePage(title, content, e.getErrors());
+                ctx.render("articles/build.jte", model("page", page));
+            }
+        });
+        // END
 
         return app;
     }
@@ -286,10 +337,13 @@ public class HelloWorld {
         /*Javalin app2 = getAppCourse();
         app2.start("0.0.0.0", 8080);*/
 
-        Javalin app3 = getAppUser();
-        app3.start("0.0.0.0", 7070);
+        /*Javalin app3 = getAppUser();
+        app3.start("0.0.0.0", 7070);*/
 
         /*Javalin app4 = getAppNewUser();
         app4.start("0.0.0.0", 7070);*/
+
+        Javalin app5 = getArticleApp();
+        app5.start("0.0.0.0", 7070);
     }
 }
