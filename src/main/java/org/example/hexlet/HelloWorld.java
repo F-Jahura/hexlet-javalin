@@ -22,6 +22,7 @@ import org.example.hexlet.model.User;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.hexlet.repository.ArticleRepository;
 import org.example.hexlet.repository.NewUserRepository;
+import org.example.hexlet.NamedRoutes;
 import org.example.hexlet.repository.UserRepository;
 
 import java.nio.file.Path;
@@ -176,7 +177,7 @@ public class HelloWorld {
         });
 
         // BEGIN (write your solution here)
-        app.get("/users/{id}", ctx -> {               //   http://localhost:7070/users/14
+        app.get(NamedRoutes.userPath("{id}"), ctx -> {               //   http://localhost:7070/users/14
             var id = ctx.pathParam("id");
             var escapedId = StringEscapeUtils.escapeHtml4(id);
             var userId = Long.parseLong(escapedId);
@@ -195,7 +196,7 @@ public class HelloWorld {
         });*/
 
 
-        app.get("/users", ctx -> {
+        app.get(NamedRoutes.usersPath(), ctx -> {
             var term = ctx.queryParam("term");
             List<User> users;
             if (term != null) {
@@ -227,7 +228,7 @@ public class HelloWorld {
             ctx.render("index.jte");
         });
 
-        app.get("/users", ctx -> {
+        app.get(NamedRoutes.usersPath(), ctx -> {
             List<NewUser> users = NewUserRepository.getEntities();
             var page = new NewUsersPage(users);
             ctx.render("newusers/index.jte", model("page", page));
@@ -237,7 +238,7 @@ public class HelloWorld {
             ctx.render("newusers/build.jte");
         });*/
 
-        app.get("/users/build", ctx -> {
+        app.get(NamedRoutes.buildUserPath(), ctx -> {
             var page = new BuildNewUserPage();
             ctx.render("newusers/build.jte", model("page", page));
         });
@@ -256,7 +257,7 @@ public class HelloWorld {
             ctx.redirect("/users");
         });*/
 
-        app.post("/users", ctx -> {
+        app.post(NamedRoutes.usersPath(), ctx -> {
             var firstName = ctx.formParam("firstName").trim();
             var lastName = ctx.formParam("lastName").trim();
             var email = ctx.formParam("email");
@@ -270,7 +271,7 @@ public class HelloWorld {
                         .get();
                 var user = new NewUser(firstName, lastName, email, password);
                 NewUserRepository.save(user);
-                ctx.redirect("/users");
+                ctx.redirect(NamedRoutes.usersPath());
             } catch (ValidationException e) {
                 ctx.status(422);
                 var page = new BuildNewUserPage(firstName, lastName, email, e.getErrors());
@@ -337,13 +338,13 @@ public class HelloWorld {
         /*Javalin app2 = getAppCourse();
         app2.start("0.0.0.0", 8080);*/
 
-        /*Javalin app3 = getAppUser();
-        app3.start("0.0.0.0", 7070);*/
+        Javalin app3 = getAppUser();
+        app3.start("0.0.0.0", 7070);
 
         /*Javalin app4 = getAppNewUser();
         app4.start("0.0.0.0", 7070);*/
 
-        Javalin app5 = getArticleApp();
-        app5.start("0.0.0.0", 7070);
+        /*Javalin app5 = getArticleApp();
+        app5.start("0.0.0.0", 7070);*/
     }
 }

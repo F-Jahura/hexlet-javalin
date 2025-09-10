@@ -1,3 +1,4 @@
+@import org.example.hexlet.NamedRoutes
 @import org.example.hexlet.dto.users.UsersPage
 @param UsersPage page
 
@@ -7,7 +8,7 @@
     </head>
     <body>
         <h2>Users List:</h2>
-        <form action="/users" method="get">
+        <form action="${NamedRoutes.usersPath()}" method="get">
         <input type="search" name="term" value="${page.getTerm()}" />
         <input type="submit" value="Search" />
         </form>
@@ -21,7 +22,7 @@
                        ${user.getId()}
                    </td>
                    <td>
-                       <a href="/users/${user.getId()}">${user.getFirstName()} ${user.getLastName()}</a>
+                       <a href="${NamedRoutes.userPath(user.getId())}">${user.getFirstName()} ${user.getLastName()}</a>
                        ${user.getEmail()}
                        ${user.getPassword()}
                    </td>

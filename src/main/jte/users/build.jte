@@ -5,7 +5,7 @@
     <title>Registration</title>
 </head>
 <body>
-    <form action="/users" method="post">
+    <form action="${NamedRoutes.usersPath()}" method="post">
     <div>
             <label>
               Id
