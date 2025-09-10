@@ -2,13 +2,16 @@ package org.example.hexlet.model;
 
 public class NewUser {
     private Long id;
+    private String firstName;
 
-    private String name;
+    private String lastName;
+
     private String email;
     private String password;
 
-    public NewUser(String name, String email, String password) {
-        this.name = name;
+    public NewUser(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
@@ -21,12 +24,20 @@ public class NewUser {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {

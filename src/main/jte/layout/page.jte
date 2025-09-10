@@ -7,16 +7,16 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Hexlet Javalin Example</title>
+        <title>Hello, Hexlet</title>
     </head>
     <body>
         <p>
             <h1>About us</h1>
-            <p>
-            <a href="/users">Users</a>
-            </p>
         </p>
         ${content}
+        <p>
+          <a href="/users">User Details</a>
+        </p>
         @if (footer != null)
         <div class="footer">
             ${footer}

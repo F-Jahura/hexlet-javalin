@@ -2,15 +2,19 @@ package org.example.hexlet;
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
+import io.javalin.validation.ValidationException;
 import org.example.hexlet.data.*;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
+import org.example.hexlet.dto.newusers.BuildNewUserPage;
+import org.example.hexlet.dto.newusers.NewUsersPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.Course;
 import org.example.hexlet.model.NewUser;
 import org.example.hexlet.model.User;
 import org.apache.commons.text.StringEscapeUtils;
+import org.example.hexlet.repository.NewUserRepository;
 import org.example.hexlet.repository.UserRepository;
 
 import java.util.Collections;
@@ -202,14 +206,36 @@ public class HelloWorld {
             ctx.render("index.jte");
         });
 
+        return app;
+    }
 
-        app.get("/users-build", ctx -> {
-            ctx.render("users/build.jte");
+    public static Javalin getAppNewUser() {
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
         });
 
-        app.post("/users", ctx -> {
-            var id = ctx.pathParam("id");
-            var userId = Long.parseLong(id);
+        app.get("/", ctx -> {
+            ctx.render("index.jte");
+        });
+
+        app.get("/users", ctx -> {
+            List<NewUser> users = NewUserRepository.getEntities();
+            var page = new NewUsersPage(users);
+            ctx.render("newusers/index.jte", model("page", page));
+        });
+
+        /*app.get("/users/build", ctx -> {                       // http://localhost:7070/users
+            ctx.render("newusers/build.jte");
+        });*/
+
+        app.get("/users/build", ctx -> {
+            var page = new BuildNewUserPage();
+            ctx.render("newusers/build.jte", model("page", page));
+        });
+
+
+        /*app.post("/users", ctx -> {
             var firstName = ctx.formParam("firstName").trim();
             var lastName = ctx.formParam("lastName").trim();
             var email = ctx.formParam("email").trim().toLowerCase();
@@ -217,9 +243,35 @@ public class HelloWorld {
             firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
             lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
 
-            var user = new User(userId, firstName, lastName, email, password);
-            UserRepository.save(user);
+            var user = new NewUser(firstName, lastName, email, password);
+            NewUserRepository.save(user);
             ctx.redirect("/users");
+        });*/
+
+        app.post("/users", ctx -> {
+            var firstName = ctx.formParam("firstName").trim();
+            var lastName = ctx.formParam("lastName").trim();
+            var email = ctx.formParam("email").trim().toLowerCase();
+
+            try {
+                var passwordConfirmation = ctx.formParam("passwordConfirmation");
+                var password = ctx.formParamAsClass("password", String.class)
+                        .check(value -> value.equals(passwordConfirmation), "Пароли не совпадают")
+                        .check(value -> value.length() > 6, "У пароля недостаточная длина")
+                        .get();
+                var user = new NewUser(firstName, lastName, email, password);
+                NewUserRepository.save(user);
+                ctx.redirect("/users");
+            } catch (ValidationException e) {
+                var page = new BuildNewUserPage(firstName, lastName, email, e.getErrors());
+                ctx.render("users/build.jte", model("page", page));
+            }
+        });
+
+
+        app.post("/__test/clear", ctx -> {
+            NewUserRepository.clear();
+            ctx.status(204);
         });
 
         return app;
@@ -231,10 +283,13 @@ public class HelloWorld {
         /*Javalin app = getApp();
         app.start("0.0.0.0", 8080);*/
 
-        Javalin app2 = getAppCourse();
-        app2.start("0.0.0.0", 8080);
+        /*Javalin app2 = getAppCourse();
+        app2.start("0.0.0.0", 8080);*/
 
         Javalin app3 = getAppUser();
         app3.start("0.0.0.0", 7070);
+
+        /*Javalin app4 = getAppNewUser();
+        app4.start("0.0.0.0", 7070);*/
     }
 }

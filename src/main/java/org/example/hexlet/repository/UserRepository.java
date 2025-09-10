@@ -12,8 +12,10 @@ public class UserRepository {
 
         public static void save(User user) {
             // Формируется идентификатор
-            user.setId((long) entities.size() + 1);
+            //user.setId((long) entities.size() + 1);
+            user.setId((long) UserRepository.getEntities().size() + 1);
             entities.add(user);
+            System.out.println("Сохранён пользователь: " + user);
         }
 
         public static List<User> search(String term) {
@@ -33,4 +35,5 @@ public class UserRepository {
         public static List<User> getEntities() {
             return entities;
         }
+
 }
