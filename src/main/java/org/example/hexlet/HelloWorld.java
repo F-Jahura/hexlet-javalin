@@ -11,15 +11,13 @@ import org.example.hexlet.dto.articles.ArticlesPage;
 import org.example.hexlet.dto.articles.BuildArticlePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
-import org.example.hexlet.dto.newusers.BuildNewUserPage;
-import org.example.hexlet.dto.newusers.NewUsersPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.*;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.hexlet.repository.ArticleRepository;
-import org.example.hexlet.repository.NewUserRepository;
 
+import javax.naming.Name;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -320,11 +318,14 @@ public class HelloWorld {
             config.fileRenderer(new JavalinJte());
         });
 
+        app.post(NamedRoutes.postsPath(), PostsController::create);
         app.get(NamedRoutes.rootPath(), RootController::index);
 
         app.get(NamedRoutes.postPath("{id}"), PostsController::show);
         app.get(NamedRoutes.postsPath(), PostsController::index);
 
+        app.get(NamedRoutes.postEditPath("{id}"), PostsController::edit);
+        app.post(NamedRoutes.postUpdatePath("{id}"), PostsController::update);
         return app;
     }
     public static void main(String[] args) {

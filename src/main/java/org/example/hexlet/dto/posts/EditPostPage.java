@@ -1,0 +1,41 @@
+package org.example.hexlet.dto.posts;
+
+import io.javalin.validation.ValidationError;
+
+import java.util.List;
+import java.util.Map;
+
+public class EditPostPage {
+    private Long id;
+    private String name;
+    private String body;
+    private Map<String, List<ValidationError<Object>>> errors;
+
+    public EditPostPage() {
+    }
+
+
+
+    public EditPostPage(Long id, String name, String body, Map<String, List<ValidationError<Object>>> errors) {
+        this.id = id;
+        this.name = name;
+        this.body = body;
+        this.errors = errors;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Map<String, List<ValidationError<Object>>> getErrors() {
+        return errors;
+    }
+}

@@ -1,12 +1,16 @@
-@import org.example.hexlet.NamedRoutes
 @import org.example.hexlet.dto.posts.PostPage
+@import org.example.hexlet.NamedRoutes
+
 @param PostPage page
 
-<!-- Для наглядности мы не стали включать сюда основную структуру HTML -->
 <main>
-      <div>${page.getPost().getName()}</div>
-      <div>${page.getPost().getBody()}</div>
-      <div>
-         <a href="${NamedRoutes.postsPath()}">Post list</a>
-      </div>
+    <div>ID: ${page.getPost().getId()}</div>
+    <div>Name: ${page.getPost().getName()}</div>
+    <div>Content: ${page.getPost().getBody()}</div>
+    <div>
+        <a href="/posts">Return to post list</a>
+    </div>
+    <div>
+        <a href="${NamedRoutes.postEditPath(page.getPost().getId().toString())}">Edit</a>
+    </div>
 </main>
