@@ -1,10 +1,11 @@
 package org.example.hexlet.dto.newusers;
 
+import org.example.hexlet.dto.BasePage;
 import org.example.hexlet.model.NewUser;
 
 import java.util.List;
 
-public class NewUsersPage {
+public class NewUsersPage extends BasePage {
     private List<NewUser> newusers;
 
     public NewUsersPage(List<NewUser> newusers) {
@@ -14,4 +15,5 @@ public class NewUsersPage {
     public List<NewUser> getNewusers() {
         return newusers;
     }
+
 }

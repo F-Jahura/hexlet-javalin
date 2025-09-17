@@ -1,6 +1,6 @@
 @import org.example.hexlet.NamedRoutes
 @import org.example.hexlet.dto.newusers.BuildNewUserPage
-  @param BuildNewUserPage page
+ @param BuildNewUserPage page
 
   @if(page.getErrors() != null)
       <ul>

@@ -17,6 +17,9 @@
         </li>
     @endfor
     </ul>
+    <p>
+    <a href="${NamedRoutes.buildPostPath()}">Add new post</a>
+    </p>
 
     <div>
         @if(page.getCurrentPage() > 1)

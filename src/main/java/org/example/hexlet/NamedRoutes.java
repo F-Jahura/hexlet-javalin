@@ -66,4 +66,16 @@ public class NamedRoutes {
     public static String postUpdatePath(String postId) {
         return "/posts/" + postId;
     }
+
+    public static String loginPath() {
+        return "/sessions";
+    }
+
+    public static String logoutPath() {
+        return "/sessions/delete";
+    }
+
+    public static String buildSessionPath() {
+        return "/sessions/build";
+    }
 }

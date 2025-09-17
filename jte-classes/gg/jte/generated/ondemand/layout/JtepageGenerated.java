@@ -3,7 +3,7 @@ import org.example.hexlet.NamedRoutes;
 import gg.jte.Content;
 public final class JtepageGenerated {
 	public static final String JTE_NAME = "layout/page.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,1,2,2,2,16,16,16,16,18,18,18,18,18,18,18,18,18,21,21,21,21,21,21,21,21,21,23,23,25,25,25,27,27,29,29,29,2,3,3,3,3};
+	public static final int[] JTE_LINE_INFO = {0,0,1,2,2,2,16,16,16,16,18,18,18,18,18,18,18,18,18,21,21,21,21,21,21,21,21,21,24,24,24,24,24,24,24,24,24,26,26,28,28,28,30,30,32,32,32,2,3,3,3,3};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, Content content, Content footer) {
 		jteOutput.writeContent("\r\n<!doctype html>\r\n<html lang=\"en\">\r\n    <head>\r\n        <meta charset=\"utf-8\" />\r\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\r\n        <title>Hello, Hexlet</title>\r\n    </head>\r\n    <body>\r\n        <p>\r\n            <h1>About us</h1>\r\n        </p>\r\n        ");
 		jteOutput.setContext("body", null);
@@ -17,7 +17,7 @@ public final class JtepageGenerated {
 			jteOutput.setContext("a", null);
 			jteOutput.writeContent("\"");
 		}
-		jteOutput.writeContent(">User Details</a>\r\n          </p>\r\n          <p>\r\n          <a");
+		jteOutput.writeContent(">User Details</a>\r\n        </p>\r\n        <p>\r\n          <a");
 		var __jte_html_attribute_1 = NamedRoutes.postsPath();
 		if (gg.jte.runtime.TemplateUtils.isAttributeRendered(__jte_html_attribute_1)) {
 			jteOutput.writeContent(" href=\"");
@@ -26,7 +26,16 @@ public final class JtepageGenerated {
 			jteOutput.setContext("a", null);
 			jteOutput.writeContent("\"");
 		}
-		jteOutput.writeContent(">All posts</a>\r\n        </p>\r\n        ");
+		jteOutput.writeContent(">All posts</a>\r\n        </p>\r\n         <p>\r\n           <a");
+		var __jte_html_attribute_2 = NamedRoutes.loginPath();
+		if (gg.jte.runtime.TemplateUtils.isAttributeRendered(__jte_html_attribute_2)) {
+			jteOutput.writeContent(" href=\"");
+			jteOutput.setContext("a", "href");
+			jteOutput.writeUserContent(__jte_html_attribute_2);
+			jteOutput.setContext("a", null);
+			jteOutput.writeContent("\"");
+		}
+		jteOutput.writeContent(">Sessions</a>\r\n         </p>\r\n        ");
 		if (footer != null) {
 			jteOutput.writeContent("\r\n        <div class=\"footer\">\r\n            ");
 			jteOutput.setContext("div", null);

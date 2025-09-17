@@ -4,33 +4,21 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
 import org.example.hexlet.NamedRoutes;
-import org.example.hexlet.dto.newusers.NewUserPage;
+import org.example.hexlet.dto.newusers.BuildNewUserPage;
 import org.example.hexlet.dto.posts.BuildPostPage;
 import org.example.hexlet.dto.posts.EditPostPage;
 import org.example.hexlet.dto.posts.PostPage;
 import org.example.hexlet.dto.posts.PostsPage;
+import org.example.hexlet.model.NewUser;
 import org.example.hexlet.model.Post;
 import org.example.hexlet.repository.NewUserRepository;
 import org.example.hexlet.repository.PostRepository;
+import org.example.hexlet.util.Security;
 
-import java.util.HashMap;
-import java.util.List;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class PostsController {
-    /*public static void show(Context ctx) {
-        var id = ctx.pathParamAsClass("id", Long.class).get();
-        Post post = PostRepository.find(id).orElse(null);
-
-        if (post == null) {
-            ctx.status(404).result("Page not found");
-        } else {
-            var page = new PostPage(post);
-            ctx.render("posts/show.jte", model("page", page));
-        }
-    }*/
-
     public static void show(Context ctx) {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var post = PostRepository.find(id)
@@ -40,7 +28,8 @@ public class PostsController {
         ctx.render("posts/show.jte", model("page", page));
     }
 
-    public static void index(Context ctx) {
+    //This index for page back-next
+    /*public static void index(Context ctx) {
         int pageNumber = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
         int pageSize = 5;
 
@@ -53,17 +42,40 @@ public class PostsController {
 
         // Отправляем данные в шаблон для отображения
         ctx.render("posts/index.jte", model("page", page));
+    }*/
+
+    public static void index(Context ctx) {
+        var posts = PostRepository.getEntities();
+        var page = new PostsPage(posts);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
+        ctx.render("posts/index.jte", model("page", page));
     }
-
-
-    //////////////////////////
 
     public static void build(Context ctx) {
         var page = new BuildPostPage();
         ctx.render("posts/build.jte", model("page", page));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws Exception {
+        var body = ctx.formParam("body");
+        try {
+            var name = ctx.formParamAsClass("name", String.class)
+                    .check(value -> value.length() >= 2, "Name should not be less than two symbols")
+                    .get();
+
+        var post = new Post(name, body);
+        PostRepository.save(post);
+        ctx.sessionAttribute("flash", "Post was successfully created!");
+
+        ctx.redirect(NamedRoutes.postsPath());
+        } catch (ValidationException e) {
+            var name = ctx.formParam("name");
+            var page = new BuildPostPage(name, body, e.getErrors());
+            ctx.render("posts/build.jte", model("page", page)).status(422);
+        }
+    }
+
+    /*public static void create(Context ctx) {
         try {
             var name = ctx.formParamAsClass("name", String.class)
                     .check(value -> value.length() >= 2, "Название не должно быть короче двух символов")
@@ -75,15 +87,16 @@ public class PostsController {
 
             var post = new Post(name, body);
             PostRepository.save(post);
+            ctx.sessionAttribute("flash", "Post was successfully created!");
             ctx.redirect(NamedRoutes.postsPath());
 
-        } catch (ValidationException e) {
+       } catch (ValidationException e) {
             var name = ctx.formParam("name");
             var body = ctx.formParam("body");
             var page = new BuildPostPage(name, body, e.getErrors());
             ctx.render("posts/build.jte", model("page", page)).status(422);
         }
-    }
+    }*/
 
     public static void edit(Context ctx) {
         var id = ctx.pathParamAsClass("id", Long.class).get();

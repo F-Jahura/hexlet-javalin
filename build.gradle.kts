@@ -31,6 +31,8 @@ dependencies {
     implementation("gg.jte:jte:3.1.9")
     implementation("io.javalin:javalin-rendering:6.1.3")
     implementation ("org.apache.commons:commons-text:1.9")
+    implementation ("commons-codec:commons-codec:1.18.0")
+    implementation ("com.google.guava:guava:31.1-jre")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

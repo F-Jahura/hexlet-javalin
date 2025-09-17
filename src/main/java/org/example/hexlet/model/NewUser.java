@@ -7,13 +7,15 @@ public class NewUser {
     private String lastName;
 
     private String email;
-    private String password;
+    private String encriptedPassword;
+    private String token;
 
-    public NewUser(String firstName, String lastName, String email, String password) {
+    public NewUser(String firstName, String lastName, String email, String encriptedPassword, String token) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
+        this.encriptedPassword = encriptedPassword;
+        this.token = token;
     }
 
     public Long getId() {
@@ -48,11 +50,19 @@ public class NewUser {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getEncriptedPassword() {
+        return encriptedPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setEncriptedPassword(String encriptedPassword) {
+        this.encriptedPassword = encriptedPassword;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

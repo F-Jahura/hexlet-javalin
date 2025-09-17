@@ -19,6 +19,13 @@
                 User list
             </p>
 
+            @if(page != null && page.getFlash() != null)
+                <div class="alert alert-success" role="alert">
+                   <p>${page.getFlash()}</p>
+                </div>
+            @endif
+
+
             <!-- Проверяем, есть ли пользователи -->
             @if(page.getNewusers().size() > 0)
                 <table>

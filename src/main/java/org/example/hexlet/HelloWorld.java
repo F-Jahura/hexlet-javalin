@@ -6,16 +6,19 @@ import io.javalin.validation.ValidationException;
 import org.example.hexlet.controller.NewUsersController;
 import org.example.hexlet.controller.PostsController;
 import org.example.hexlet.controller.RootController;
+import org.example.hexlet.controller.SessionUserController;
 import org.example.hexlet.data.*;
 import org.example.hexlet.dto.articles.ArticlesPage;
 import org.example.hexlet.dto.articles.BuildArticlePage;
 import org.example.hexlet.dto.courses.CoursePage;
 import org.example.hexlet.dto.courses.CoursesPage;
+import org.example.hexlet.dto.sessionuser.MainPage;
 import org.example.hexlet.dto.users.UserPage;
 import org.example.hexlet.dto.users.UsersPage;
 import org.example.hexlet.model.*;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.hexlet.repository.ArticleRepository;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.naming.Name;
 import java.util.Collections;
@@ -318,6 +321,7 @@ public class HelloWorld {
             config.fileRenderer(new JavalinJte());
         });
 
+        app.get(NamedRoutes.buildPostPath(), PostsController::build);
         app.post(NamedRoutes.postsPath(), PostsController::create);
         app.get(NamedRoutes.rootPath(), RootController::index);
 
@@ -326,6 +330,29 @@ public class HelloWorld {
 
         app.get(NamedRoutes.postEditPath("{id}"), PostsController::edit);
         app.post(NamedRoutes.postUpdatePath("{id}"), PostsController::update);
+
+        app.after(ctx -> {
+            String responseBody = ctx.result();
+            String sha256hex = DigestUtils.sha256Hex(responseBody);
+            ctx.header("X-Response-Digest", sha256hex);
+        });
+        return app;
+    }
+
+    public static Javalin getAppSessionUser() {
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        app.get("/", ctx -> {
+            ctx.render("index.jte");
+        });
+
+        app.get(NamedRoutes.loginPath(), SessionUserController::index);
+        app.get(NamedRoutes.buildSessionPath(), SessionUserController::build);
+        app.post(NamedRoutes.loginPath(), SessionUserController::create);
+        app.post(NamedRoutes.logoutPath(), SessionUserController::destroy);
         return app;
     }
     public static void main(String[] args) {
@@ -347,7 +374,13 @@ public class HelloWorld {
         /*Javalin app5 = getArticleApp();
         app5.start("0.0.0.0", 7070);*/
 
-        Javalin app6 = getAppPost();
-        app6.start("0.0.0.0", 7070);
+        /*Javalin app6 = getAppPost();
+        app6.start("0.0.0.0", 7070);*/
+
+        Javalin app7 = getAppSessionUser();
+        app7.start("0.0.0.0", 7070);
+
+        /*Javalin app8 = getAppSessionUser();
+        app8.start("0.0.0.0", 7070);*/
     }
 }

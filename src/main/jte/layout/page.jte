@@ -17,10 +17,13 @@
         ${content}
         <p>
           <a href="${NamedRoutes.usersPath()}">User Details</a>
-          </p>
-          <p>
+        </p>
+        <p>
           <a href="${NamedRoutes.postsPath()}">All posts</a>
         </p>
+         <p>
+           <a href="${NamedRoutes.loginPath()}">Sessions</a>
+         </p>
         @if (footer != null)
         <div class="footer">
             ${footer}
