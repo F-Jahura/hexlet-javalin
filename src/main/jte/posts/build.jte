@@ -26,5 +26,4 @@
       </label>
     </div>
     <input type="submit" value="Register" />
-
   </form>

@@ -24,6 +24,9 @@
          <p>
            <a href="${NamedRoutes.loginPath()}">Sessions</a>
          </p>
+         <p>
+           <a href="${NamedRoutes.carsPath()}">DataBase</a>
+         </p>
         @if (footer != null)
         <div class="footer">
             ${footer}

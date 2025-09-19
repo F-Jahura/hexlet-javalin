@@ -3,10 +3,7 @@ import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import io.javalin.validation.ValidationException;
-import org.example.hexlet.controller.NewUsersController;
-import org.example.hexlet.controller.PostsController;
-import org.example.hexlet.controller.RootController;
-import org.example.hexlet.controller.SessionUserController;
+import org.example.hexlet.controller.*;
 import org.example.hexlet.data.*;
 import org.example.hexlet.dto.articles.ArticlesPage;
 import org.example.hexlet.dto.articles.BuildArticlePage;
@@ -19,14 +16,22 @@ import org.example.hexlet.model.*;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.hexlet.repository.ArticleRepository;
 import org.apache.commons.codec.digest.DigestUtils;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.example.hexlet.repository.BaseRepository;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.naming.Name;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
+
 
 public class HelloWorld {
     private static final List<Map<String, String>> COMPANIES = DataCompay.getCompanies();
@@ -355,7 +360,68 @@ public class HelloWorld {
         app.post(NamedRoutes.logoutPath(), SessionUserController::destroy);
         return app;
     }
-    public static void main(String[] args) {
+
+    public static Javalin getAppCar() throws IOException, SQLException {
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet;DB_CLOSE_DELAY=-1;");
+
+        var dataSource = new HikariDataSource(hikariConfig);
+        var url = HelloWorld.class.getClassLoader().getResourceAsStream("schema.sql");
+        var sql = new BufferedReader(new InputStreamReader(url))
+                .lines().collect(Collectors.joining("\n"));
+
+        // Получаем соединение, создаем стейтмент и выполняем запрос
+        //log.info(sql);
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+        BaseRepository.dataSource = dataSource;
+
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        app.get(NamedRoutes.rootPath(), RootDataBaseController::index);
+        app.post(NamedRoutes.carsPath(), CarsController::create);
+        app.get(NamedRoutes.carsPath(), CarsController::index);
+        app.get(NamedRoutes.carPath("{id}"), CarsController::show);
+
+        return app;
+    }
+
+    public static Javalin getAppProduct() throws IOException, SQLException {
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet;DB_CLOSE_DELAY=-1;");
+
+        var dataSource = new HikariDataSource(hikariConfig);
+        var url = HelloWorld.class.getClassLoader().getResourceAsStream("schema.sql");
+        var sql = new BufferedReader(new InputStreamReader(url))
+                .lines().collect(Collectors.joining("\n"));
+
+        //log.info(sql);
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+        BaseRepository.dataSource = dataSource;
+
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte());
+        });
+
+        app.get(NamedRoutes.rootPath(), RootDataBaseController::index);
+        app.post(NamedRoutes.productsPath(), ProductsController::create);
+        app.get(NamedRoutes.productsPath(), ProductsController::index);
+        app.get(NamedRoutes.productPath("{id}"), ProductsController::show);
+
+        return app;
+    }
+
+
+    public static void main(String[] args) throws SQLException, IOException {
         /*Javalin app1 = getApp1();
         app1.start("0.0.0.0", 7070);*/
 
@@ -374,13 +440,20 @@ public class HelloWorld {
         /*Javalin app5 = getArticleApp();
         app5.start("0.0.0.0", 7070);*/
 
-        /*Javalin app6 = getAppPost();
-        app6.start("0.0.0.0", 7070);*/
+        Javalin app6 = getAppPost();
+        app6.start("0.0.0.0", 7070);
 
-        Javalin app7 = getAppSessionUser();
-        app7.start("0.0.0.0", 7070);
+        /*Javalin app7 = getAppSessionUser();
+        app7.start("0.0.0.0", 7070);*/
 
-        /*Javalin app8 = getAppSessionUser();
+        /*Javalin app8 = getAppCar();
         app8.start("0.0.0.0", 7070);*/
+
+        /*Javalin app9 = getAppProduct();
+        app9.start("0.0.0.0", 7070);*/
+    }
+
+    private static String getDatabaseUrl() {
+        return System.getenv().getOrDefault("DATABASE_URL", "jdbc:h2:mem:project");
     }
 }

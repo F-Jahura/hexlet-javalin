@@ -78,4 +78,39 @@ public class NamedRoutes {
     public static String buildSessionPath() {
         return "/sessions/build";
     }
+
+
+
+    public static String productsPath() {
+        return "/products";
+    }
+
+    public static String buildProductPath() {
+        return "/products/build";
+    }
+
+    public static String productPath(Long id) {
+        return productPath(String.valueOf(id));
+    }
+
+    public static String productPath(String id) {
+        return "/products/" + id;
+    }
+
+
+    public static String carsPath() {
+        return "/cars";
+    }
+
+    public static String buildCarPath() {
+        return "/cars/build";
+    }
+
+    public static String carPath(Long id) {
+        return carPath(String.valueOf(id));
+    }
+
+    public static String carPath(String id) {
+        return "/cars/" + id;
+    }
 }
